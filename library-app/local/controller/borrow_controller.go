@@ -20,9 +20,7 @@ func NewBorrowController(borrowService *service.BorrowService) *BorrowController
 	}
 }
 
-// Register is an HTTP handler function to handle borrow requests.
 func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
-	// Parse JSON request body into BorrowDTO
 	var borrowDTO dto.BorrowDTO
 	err := json.NewDecoder(r.Body).Decode(&borrowDTO)
 	if err != nil {
@@ -30,14 +28,30 @@ func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Register the borrow using the BorrowService
 	err = c.borrowService.CreateNewBorrow(context.Background(), borrowDTO)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Respond with success status
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Book successfully borrowed"))
+}
+
+func (c *BorrowController) ReturnBook(w http.ResponseWriter, r *http.Request) {
+	var returnDTO dto.ReturnDTO
+	err := json.NewDecoder(r.Body).Decode(&returnDTO)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	err = c.borrowService.ReturnBorrow(context.Background(), returnDTO)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("Borrow successfully returned"))
 }

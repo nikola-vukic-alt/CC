@@ -30,6 +30,7 @@ func main() {
 
 	router := http.NewServeMux()
 	router.HandleFunc("/borrow", borrowController.BorrowBook)
+	router.HandleFunc("/return", borrowController.ReturnBook)
 
 	server := &http.Server{
 		Addr:    ":8081",

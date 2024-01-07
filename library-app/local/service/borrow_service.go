@@ -55,7 +55,7 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 		return errors.New("Member is already borrowing three books.")
 	}
 
-	err = increaseBorrowCount(member, client)
+	err = updateBorrowCount(member, client, true)
 	if err != nil {
 		return err
 	}
@@ -75,6 +75,37 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 	}
 
 	return nil
+}
+
+func (s *BorrowService) ReturnBorrow(ctx context.Context, returnDTO dto.ReturnDTO) error {
+	if isInvalidReturn(returnDTO) {
+		return errors.New("All the fields are required.")
+	}
+	client := &http.Client{}
+	member, err := getMemberBySSN(returnDTO.SSN, client)
+	if err != nil {
+		return err
+	}
+	borrow, err := s.borrowRepo.GetMembersBorrow(ctx, member.Id, returnDTO.Title)
+	if err != nil {
+		return err
+	}
+	borrow.To = time.Now()
+	err = s.borrowRepo.UpdateBorrow(ctx, borrow.Id, borrow)
+	if err != nil {
+		return err
+	}
+	err = updateBorrowCount(member, client, false)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func isInvalidReturn(returnDTO dto.ReturnDTO) bool {
+	ssnMissing := len(returnDTO.SSN) == 0
+	titleMissing := len(returnDTO.Title) == 0
+	return titleMissing || ssnMissing
 }
 
 func isInvalidDTO(borrowDTO dto.BorrowDTO) bool {
@@ -109,10 +140,14 @@ func getMemberBySSN(ssn string, client *http.Client) (Member, error) {
 	return m, nil
 }
 
-func increaseBorrowCount(member Member, client *http.Client) error {
+func updateBorrowCount(member Member, client *http.Client, shouldIncrease bool) error {
 	var updateDTO UpdateDTO
 	updateDTO.SSN = member.SSN
-	updateDTO.NewCount = member.BorrowCnt + 1
+	if shouldIncrease {
+		updateDTO.NewCount = member.BorrowCnt + 1
+	} else {
+		updateDTO.NewCount = member.BorrowCnt - 1
+	}
 	requestBody, err := json.Marshal(updateDTO)
 	if err != nil {
 		return fmt.Errorf("Error encoding UpdateDTO into JSON: %v", err)
@@ -134,6 +169,6 @@ func increaseBorrowCount(member Member, client *http.Client) error {
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Unexpected status code: %v", resp.StatusCode)
 	}
-
+	log.Printf("New borrow count is %d.\n", updateDTO.NewCount)
 	return nil
 }
