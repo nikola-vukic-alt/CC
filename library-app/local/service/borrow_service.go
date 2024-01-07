@@ -10,6 +10,7 @@ import (
 	"library-app/local/repository"
 	"log"
 	"net/http"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -50,8 +51,7 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 		Title:  borrowDTO.Title,
 		Author: borrowDTO.Author,
 		ISBN:   borrowDTO.ISBN,
-		From:   borrowDTO.From,
-		To:     borrowDTO.To,
+		From:   time.Now(),
 	}
 
 	err := s.borrowRepo.SaveBorrow(ctx, newBorrow)
@@ -66,9 +66,7 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 func isInvalidDTO(borrowDTO dto.BorrowDTO) bool {
 	titleMissing := len(borrowDTO.Title) == 0
 	ssnMissing := len(borrowDTO.SSN) == 0
-	fromMissing := borrowDTO.From.IsZero()
-	toMissing := borrowDTO.To.IsZero()
-	return titleMissing || ssnMissing || fromMissing || toMissing
+	return titleMissing || ssnMissing
 }
 
 func getMemberBySSN(ssn string, client *http.Client) Member {

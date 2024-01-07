@@ -52,6 +52,15 @@ func (s *MemberService) GetMemberBySSN(ctx context.Context, ssn string) (model.M
 	return s.memberRepo.GetMemberBySSN(ctx, ssn)
 }
 
+func (s *MemberService) UpdateBorrowCount(ctx context.Context, updateDTO dto.UpdateDTO) error {
+	member, err := s.memberRepo.GetMemberBySSN(ctx, updateDTO.SSN)
+	if err != nil {
+		return err
+	}
+	member.BorrowCnt = updateDTO.NewCount
+	return s.memberRepo.UpdateMember(ctx, member.Id, member)
+}
+
 func isInvalidDTO(registrationDTO dto.RegistrationDTO) bool {
 	nameMissing := len(registrationDTO.Name) == 0
 	surnameMissing := len(registrationDTO.Surname) == 0

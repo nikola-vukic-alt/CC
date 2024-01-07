@@ -76,10 +76,9 @@ func (r *MemberRepository) GetAllMembers(ctx context.Context) ([]model.Member, e
 	return members, nil
 }
 
-func (r *MemberRepository) UpdateBorrowCount(ctx context.Context, id primitive.ObjectID, newCount int) error {
+func (r *MemberRepository) UpdateMember(ctx context.Context, id primitive.ObjectID, updatedMember model.Member) error {
 	filter := bson.M{"_id": id}
-	update := bson.M{"$set": bson.M{"_borrowCnt": newCount}}
-
+	update := bson.M{"$set": updatedMember}
 	_, err := r.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Printf("Error updating member: %v\n", err)
