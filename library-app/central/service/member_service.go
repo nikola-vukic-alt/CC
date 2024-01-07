@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"library-app/central/dto"
 	"library-app/central/model"
 	"library-app/central/repository"
@@ -19,16 +21,28 @@ func NewMemberService(memberRepo *repository.MemberRepository) *MemberService {
 }
 
 func (s *MemberService) RegisterMember(ctx context.Context, registrationDTO dto.RegistrationDTO) error {
-	// You can perform validation on registrationDTO fields if needed
-
-	newMember := model.Member{
-		Name:    registrationDTO.Name,
-		Surname: registrationDTO.Surname,
-		Address: registrationDTO.Address,
-		SSN:     registrationDTO.SSN,
+	nameMissing := len(registrationDTO.Name) == 0
+	surnameMissing := len(registrationDTO.Surname) == 0
+	addressMissing := len(registrationDTO.Address) == 0
+	ssnMissing := len(registrationDTO.SSN) == 0
+	if nameMissing || surnameMissing || addressMissing || ssnMissing {
+		return errors.New("All the fields are required.")
 	}
 
-	err := s.memberRepo.SaveMember(ctx, newMember)
+	existingMember, err := s.memberRepo.GetMemberBySSN(ctx, registrationDTO.SSN)
+	if existingMember.SSN == registrationDTO.SSN {
+		return fmt.Errorf("Member with SSN: %s already exists.", registrationDTO.SSN)
+	}
+
+	newMember := model.Member{
+		Name:      registrationDTO.Name,
+		Surname:   registrationDTO.Surname,
+		Address:   registrationDTO.Address,
+		SSN:       registrationDTO.SSN,
+		BorrowCnt: 0,
+	}
+
+	err = s.memberRepo.SaveMember(ctx, newMember)
 	if err != nil {
 		log.Printf("Error registering member: %v\n", err)
 		return err

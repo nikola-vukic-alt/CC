@@ -33,7 +33,7 @@ func (c *MemberController) Register(w http.ResponseWriter, r *http.Request) {
 	// Register the member using the MemberService
 	err = c.memberService.RegisterMember(context.Background(), registrationDTO)
 	if err != nil {
-		http.Error(w, "Failed to register member", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
