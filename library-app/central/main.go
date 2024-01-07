@@ -31,6 +31,7 @@ func main() {
 
 	router := http.NewServeMux()
 	router.HandleFunc("/register", memberController.Register)
+	router.HandleFunc("/get", memberController.GetMemberBySSN)
 
 	server := &http.Server{
 		Addr:    ":8080",
@@ -38,7 +39,7 @@ func main() {
 	}
 
 	go func() {
-		log.Println("Server listening on :8080")
+		log.Println("Central library server listening on :8080")
 		if err := server.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}
@@ -48,7 +49,7 @@ func main() {
 	signal.Notify(stopChan, os.Interrupt)
 	<-stopChan
 
-	log.Println("Shutting down the server...")
+	log.Println("Shutting down the central library server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
