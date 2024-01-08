@@ -13,6 +13,7 @@ It will test for:
 - trying to double borrow
 - returning a book that was not borrowed
 - trying to double return 
-- ...\
+- ...
+
 The results will be displayed in terminal.\
 After finishing all the tests it will run *docker compose down*.
