@@ -28,14 +28,18 @@ func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.borrowService.CreateNewBorrow(context.Background(), borrowDTO)
+	err, isBadRequest := c.borrowService.CreateNewBorrow(context.Background(), borrowDTO)
 	if err != nil {
+		if isBadRequest {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Book successfully borrowed"))
+	w.Write([]byte("Book borrowed successfully"))
 }
 
 func (c *BorrowController) ReturnBook(w http.ResponseWriter, r *http.Request) {
@@ -46,8 +50,12 @@ func (c *BorrowController) ReturnBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.borrowService.ReturnBorrow(context.Background(), returnDTO)
+	err, isBadRequest := c.borrowService.ReturnBorrow(context.Background(), returnDTO)
 	if err != nil {
+		if isBadRequest {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

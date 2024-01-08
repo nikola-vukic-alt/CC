@@ -40,24 +40,31 @@ func NewBorrowService(borrowRepo *repository.BorrowRepository) *BorrowService {
 	}
 }
 
-func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.BorrowDTO) error {
+// return type: (error, isBadRequest)
+func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.BorrowDTO) (error, bool) {
 	if isInvalidDTO(borrowDTO) {
-		return errors.New("All the fields are required.")
+		return errors.New("All the fields are required."), true
 	}
 
 	client := &http.Client{}
 
 	member, err := getMemberBySSN(borrowDTO.SSN, client)
 	if err != nil {
-		return err
+		return err, false
 	}
 	if member.BorrowCnt > 2 {
-		return errors.New("Member is already borrowing three books.")
+		return errors.New("Member is already borrowing three books."), true
 	}
-
+	borrow, isNotFound, err := s.borrowRepo.GetMembersBorrow(ctx, member.Id, borrowDTO.Title)
+	if err != nil && !isNotFound {
+		return err, false
+	}
+	if borrow.Title == borrowDTO.Title {
+		return errors.New("You have already borrowed this book."), true
+	}
 	err = updateBorrowCount(member, client, true)
 	if err != nil {
-		return err
+		return err, false
 	}
 
 	newBorrow := model.Borrow{
@@ -71,35 +78,42 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 	err = s.borrowRepo.SaveBorrow(ctx, newBorrow)
 	if err != nil {
 		log.Printf("Error registering borrow: %v\n", err)
-		return err
+		return err, false
 	}
 
-	return nil
+	return nil, false
 }
 
-func (s *BorrowService) ReturnBorrow(ctx context.Context, returnDTO dto.ReturnDTO) error {
+// return type: (error, isBadRequest)
+func (s *BorrowService) ReturnBorrow(ctx context.Context, returnDTO dto.ReturnDTO) (error, bool) {
 	if isInvalidReturn(returnDTO) {
-		return errors.New("All the fields are required.")
+		return errors.New("All the fields are required."), true
 	}
 	client := &http.Client{}
 	member, err := getMemberBySSN(returnDTO.SSN, client)
 	if err != nil {
-		return err
+		return err, false
 	}
-	borrow, err := s.borrowRepo.GetMembersBorrow(ctx, member.Id, returnDTO.Title)
+	borrow, isNotFound, err := s.borrowRepo.GetMembersBorrow(ctx, member.Id, returnDTO.Title)
 	if err != nil {
-		return err
+		if isNotFound {
+			return err, true
+		}
+		return err, true
+	}
+	if borrow.From.Before(borrow.To) {
+		return errors.New("You have already returned this borrow."), true
 	}
 	borrow.To = time.Now()
 	err = s.borrowRepo.UpdateBorrow(ctx, borrow.Id, borrow)
 	if err != nil {
-		return err
+		return err, false
 	}
 	err = updateBorrowCount(member, client, false)
 	if err != nil {
-		return err
+		return err, false
 	}
-	return nil
+	return nil, false
 }
 
 func isInvalidReturn(returnDTO dto.ReturnDTO) bool {

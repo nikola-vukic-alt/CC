@@ -31,19 +31,20 @@ func (r *BorrowRepository) SaveBorrow(ctx context.Context, borrow model.Borrow) 
 	return nil
 }
 
-func (r *BorrowRepository) GetMembersBorrow(ctx context.Context, memberId primitive.ObjectID, title string) (model.Borrow, error) {
+// return type is (borrow, isNotFound, err)
+func (r *BorrowRepository) GetMembersBorrow(ctx context.Context, memberId primitive.ObjectID, title string) (model.Borrow, bool, error) {
 	var borrow model.Borrow
 
 	filter := bson.M{"_userId": memberId, "_title": title}
 	err := r.collection.FindOne(ctx, filter).Decode(&borrow)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return model.Borrow{}, fmt.Errorf("borrow not found")
+			return model.Borrow{}, true, fmt.Errorf("borrow not found")
 		}
 		log.Printf("Error getting borrow: %v\n", err)
-		return model.Borrow{}, err
+		return model.Borrow{}, false, err
 	}
-	return borrow, nil
+	return borrow, false, nil
 }
 
 func (r *BorrowRepository) UpdateBorrow(ctx context.Context, id primitive.ObjectID, updatedBorrow model.Borrow) error {
