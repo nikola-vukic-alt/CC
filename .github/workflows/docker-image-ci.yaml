@@ -1,0 +1,35 @@
+name: docker image ci
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Login to DockerHub
+      env:
+        USERNAME: ${{secrets.DOCKER_USERNAME}}
+        PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: |
+        docker login -u $USERNAME -p $PASSWORD
+
+    - name: Central library image build
+      run: |
+        docker build -t nikolavukicalt/central-lib:v1 ./library-app/central
+
+    - name: Central library image push
+      run: docker push nikolavukicalt/central-lib:v1
+
+    - name: Local library image build
+      run: |
+        docker build -t nikolavukicalt/local-lib:v1 ./library-app/local
+
+    - name: Local library image push
+      run: docker push nikolavukicalt/local-lib:v1

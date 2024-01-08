@@ -1,11 +1,8 @@
 version: '3'
 services:
   central_library:
-    image: central
+    image: nikolavukicalt/central-lib:v1
     container_name: central_library
-    build:
-      context: .
-      dockerfile: ./library-app/central/Dockerfile
     restart: on-failure
     ports:
       - 8080:8080
@@ -15,11 +12,8 @@ services:
       - network
   
   ns_library:
-    image: ns
+    image: nikolavukicalt/local-lib:v1
     container_name: ns_library
-    build:
-      context: .
-      dockerfile: ./library-app/local/Dockerfile
     restart: on-failure
     ports:
       - 8081:8081
@@ -32,28 +26,22 @@ services:
       - network
 
   bg_library:
-    image: bg
+    image: nikolavukicalt/local-lib:v1
     container_name: bg_library
-    build:
-      context: .
-      dockerfile: ./library-app/local/Dockerfile
     restart: on-failure
     ports:
       - 8082:8081
     depends_on:
       - bg_db
     environment:
-    - LOCAL_DB_HOST=bg_db
-    - LOCAL_NAME=Belgrade
+      - LOCAL_DB_HOST=bg_db
+      - LOCAL_NAME=Belgrade
     networks:
       - network
 
   nis_library:
-    image: nis
+    image: nikolavukicalt/local-lib:v1
     container_name: nis_library
-    build:
-      context: .
-      dockerfile: ./library-app/local/Dockerfile
     restart: on-failure
     ports:
       - 8083:8081

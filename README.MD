@@ -4,7 +4,7 @@ Start and test the application with
 chmod +x test.sh && ./test.sh
 ``` 
 command (from root directory).\
-The script will run docker commpose up, starting the application, and then send various requests.\
+The script will run *docker compose up*, starting the application, and then send various requests.\
 It will test for:
 - trying to borrow or return a book by a non-member
 - valid registration
@@ -13,5 +13,6 @@ It will test for:
 - trying to double borrow
 - returning a book that was not borrowed
 - trying to double return 
-- ...
-After finishing all the tests it will run docker compose down.
+- ...\
+The results will be displayed in terminal.\
+After finishing all the tests it will run *docker compose down*.
