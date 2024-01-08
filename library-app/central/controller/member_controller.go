@@ -28,14 +28,20 @@ func (c *MemberController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err, statusCode := c.memberService.RegisterMember(context.Background(), registrationDTO)
+	err, statusCode, newMember := c.memberService.RegisterMember(context.Background(), registrationDTO)
 	if err != nil {
 		http.Error(w, err.Error(), statusCode)
 		return
 	}
 
+	responseJSON, err := json.Marshal(newMember)
+	if err != nil {
+		http.Error(w, "Error encoding response body", http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Member successfully registered\n"))
+	w.Write(responseJSON)
 }
 
 func (c *MemberController) GetMemberBySSN(w http.ResponseWriter, r *http.Request) {

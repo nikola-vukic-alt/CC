@@ -21,18 +21,18 @@ func NewMemberService(memberRepo *repository.MemberRepository) *MemberService {
 	}
 }
 
-func (s *MemberService) RegisterMember(ctx context.Context, registrationDTO dto.RegistrationDTO) (error, int) {
+func (s *MemberService) RegisterMember(ctx context.Context, registrationDTO dto.RegistrationDTO) (error, int, dto.MemberDTO) {
 
 	if isInvalidDTO(registrationDTO) {
-		return errors.New("All the fields are required."), http.StatusBadRequest
+		return errors.New("All the fields are required."), http.StatusBadRequest, dto.MemberDTO{}
 	}
 
 	_, err, statusCode := s.memberRepo.GetMemberBySSN(ctx, registrationDTO.SSN)
 	if err != nil && statusCode != http.StatusNotFound {
-		return err, statusCode
+		return err, statusCode, dto.MemberDTO{}
 	}
 	if statusCode == http.StatusOK {
-		return fmt.Errorf("Member with SSN: %s already exists.", registrationDTO.SSN), http.StatusBadRequest
+		return fmt.Errorf("Member with SSN: %s already exists.", registrationDTO.SSN), http.StatusBadRequest, dto.MemberDTO{}
 	}
 
 	newMember := model.Member{
@@ -46,10 +46,16 @@ func (s *MemberService) RegisterMember(ctx context.Context, registrationDTO dto.
 	err = s.memberRepo.SaveMember(ctx, newMember)
 	if err != nil {
 		log.Printf("Error registering member: %v\n", err)
-		return err, http.StatusInternalServerError
+		return err, http.StatusInternalServerError, dto.MemberDTO{}
 	}
 	log.Printf("Registered new member: %s %s - SSN: %s\n", newMember.Name, newMember.Surname, newMember.SSN)
-	return nil, http.StatusCreated
+	return nil, http.StatusCreated, dto.MemberDTO{
+		Name:      newMember.Name,
+		Surname:   newMember.Surname,
+		Address:   newMember.Address,
+		SSN:       newMember.SSN,
+		BorrowCnt: newMember.BorrowCnt,
+	}
 }
 
 func (s *MemberService) GetMemberBySSN(ctx context.Context, ssn string) (model.Member, error, int) {

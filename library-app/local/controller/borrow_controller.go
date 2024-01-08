@@ -31,14 +31,20 @@ func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err, statusCode := c.borrowService.CreateNewBorrow(context.Background(), borrowDTO)
+	err, statusCode, newBorrow := c.borrowService.CreateNewBorrow(context.Background(), borrowDTO)
 	if err != nil {
 		http.Error(w, err.Error(), statusCode)
 		return
 	}
 
+	responseJSON, err := json.Marshal(newBorrow)
+	if err != nil {
+		http.Error(w, "Error encoding response body", http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Book borrowed successfully\n"))
+	w.Write(responseJSON)
 }
 
 func (c *BorrowController) ReturnBook(w http.ResponseWriter, r *http.Request) {
@@ -50,12 +56,18 @@ func (c *BorrowController) ReturnBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err, statusCode := c.borrowService.ReturnBorrow(context.Background(), returnDTO)
+	err, statusCode, newReturn := c.borrowService.ReturnBorrow(context.Background(), returnDTO)
 	if err != nil {
 		http.Error(w, err.Error(), statusCode)
 		return
 	}
 
+	responseJSON, err := json.Marshal(newReturn)
+	if err != nil {
+		http.Error(w, "Error encoding response body", http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Borrow successfully returned\n"))
+	w.Write(responseJSON)
 }

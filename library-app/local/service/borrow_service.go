@@ -41,30 +41,30 @@ func NewBorrowService(borrowRepo *repository.BorrowRepository) *BorrowService {
 }
 
 // return type: (error, statusCode)
-func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.BorrowDTO) (error, int) {
+func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.BorrowDTO) (error, int, dto.DetailedBorrowDTO) {
 	if isInvalidDTO(borrowDTO) {
-		return errors.New("All the fields are required."), http.StatusBadRequest
+		return errors.New("All the fields are required."), http.StatusBadRequest, dto.DetailedBorrowDTO{}
 	}
 
 	client := &http.Client{}
 
 	member, err, statusCode := getMemberBySSN(borrowDTO.SSN, client)
 	if err != nil {
-		return errors.New("Member not registererd"), http.StatusBadRequest
+		return errors.New("Member not registererd"), http.StatusBadRequest, dto.DetailedBorrowDTO{}
 	}
 	if member.BorrowCnt > 2 {
-		return errors.New("Member is already borrowing three books."), http.StatusBadRequest
+		return errors.New("Member is already borrowing three books."), http.StatusBadRequest, dto.DetailedBorrowDTO{}
 	}
 	_, err, statusCode = s.borrowRepo.GetMembersBorrow(ctx, member.Id, borrowDTO.Title)
 	if err != nil && statusCode != http.StatusNotFound {
-		return err, statusCode
+		return err, statusCode, dto.DetailedBorrowDTO{}
 	}
 	if statusCode == http.StatusOK {
-		return errors.New("You have already borrowed this book."), http.StatusBadRequest
+		return errors.New("You have already borrowed this book."), http.StatusBadRequest, dto.DetailedBorrowDTO{}
 	}
 	err, statusCode = updateBorrowCount(member, client, true)
 	if err != nil {
-		return err, statusCode
+		return err, statusCode, dto.DetailedBorrowDTO{}
 	}
 
 	newBorrow := model.Borrow{
@@ -78,48 +78,64 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 	err = s.borrowRepo.SaveBorrow(ctx, newBorrow)
 	if err != nil {
 		log.Printf("Error registering borrow: %v\n", err)
-		return err, http.StatusInternalServerError
+		return err, http.StatusInternalServerError, dto.DetailedBorrowDTO{}
 	}
 	log.Printf("Member: %s %s, book title: %s - borrow count: %d\n",
 		member.Name,
 		member.Surname,
 		newBorrow.Title,
 		member.BorrowCnt+1)
-	return nil, http.StatusOK
+
+	return nil, http.StatusOK, dto.DetailedBorrowDTO{
+		SSN:       member.SSN,
+		BorrowCnt: member.BorrowCnt + 1,
+		Title:     newBorrow.Title,
+		Author:    newBorrow.Author,
+		ISBN:      newBorrow.ISBN,
+		From:      time.Now(),
+	}
 }
 
 // return type: (error, statusCode)
-func (s *BorrowService) ReturnBorrow(ctx context.Context, returnDTO dto.ReturnDTO) (error, int) {
+func (s *BorrowService) ReturnBorrow(ctx context.Context, returnDTO dto.ReturnDTO) (error, int, dto.DetailedReturnDTO) {
 	if isInvalidReturn(returnDTO) {
-		return errors.New("All the fields are required\n"), http.StatusBadRequest
+		return errors.New("All the fields are required\n"), http.StatusBadRequest, dto.DetailedReturnDTO{}
 	}
 	client := &http.Client{}
 	member, err, _ := getMemberBySSN(returnDTO.SSN, client)
 	if err != nil {
-		return errors.New("Member not found\n"), http.StatusBadRequest
+		return errors.New("Member not found\n"), http.StatusBadRequest, dto.DetailedReturnDTO{}
 	}
 	borrow, err, _ := s.borrowRepo.GetMembersBorrow(ctx, member.Id, returnDTO.Title)
 	if err != nil {
-		return errors.New("Borrow not found\n"), http.StatusBadRequest
+		return errors.New("Borrow not found\n"), http.StatusBadRequest, dto.DetailedReturnDTO{}
 	}
 	if borrow.From.Before(borrow.To) {
-		return errors.New("You have already returned this borrow\n"), http.StatusBadRequest
+		return errors.New("You have already returned this borrow\n"), http.StatusBadRequest, dto.DetailedReturnDTO{}
 	}
 	borrow.To = time.Now()
 	err = s.borrowRepo.UpdateBorrow(ctx, borrow.Id, borrow)
 	if err != nil {
-		return err, http.StatusInternalServerError
+		return err, http.StatusInternalServerError, dto.DetailedReturnDTO{}
 	}
 	err, statusCode := updateBorrowCount(member, client, false)
 	if err != nil {
-		return err, statusCode
+		return err, statusCode, dto.DetailedReturnDTO{}
 	}
 	log.Printf("Member: %s %s, book title: %s - borrow count: %d\n",
 		member.Name,
 		member.Surname,
 		borrow.Title,
 		member.BorrowCnt-1)
-	return nil, http.StatusOK
+	return nil, http.StatusOK, dto.DetailedReturnDTO{
+		SSN:       member.SSN,
+		BorrowCnt: member.BorrowCnt - 1,
+		Title:     borrow.Title,
+		Author:    borrow.Author,
+		ISBN:      borrow.ISBN,
+		From:      borrow.From,
+		To:        time.Now(),
+	}
 }
 
 func isInvalidReturn(returnDTO dto.ReturnDTO) bool {
