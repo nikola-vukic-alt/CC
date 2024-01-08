@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"library-app/local/model"
 	"log"
+	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -31,20 +32,20 @@ func (r *BorrowRepository) SaveBorrow(ctx context.Context, borrow model.Borrow) 
 	return nil
 }
 
-// return type is (borrow, isNotFound, err)
-func (r *BorrowRepository) GetMembersBorrow(ctx context.Context, memberId primitive.ObjectID, title string) (model.Borrow, bool, error) {
+// return type is (borrow, err, statusCode)
+func (r *BorrowRepository) GetMembersBorrow(ctx context.Context, memberId primitive.ObjectID, title string) (model.Borrow, error, int) {
 	var borrow model.Borrow
 
 	filter := bson.M{"_userId": memberId, "_title": title}
 	err := r.collection.FindOne(ctx, filter).Decode(&borrow)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return model.Borrow{}, true, fmt.Errorf("borrow not found")
+			return model.Borrow{}, fmt.Errorf("Borrow not found"), http.StatusNotFound
 		}
 		log.Printf("Error getting borrow: %v\n", err)
-		return model.Borrow{}, false, err
+		return model.Borrow{}, err, http.StatusBadRequest
 	}
-	return borrow, false, nil
+	return borrow, nil, http.StatusOK
 }
 
 func (r *BorrowRepository) UpdateBorrow(ctx context.Context, id primitive.ObjectID, updatedBorrow model.Borrow) error {

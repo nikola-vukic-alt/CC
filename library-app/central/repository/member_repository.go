@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"library-app/central/model"
 	"log"
+	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -45,18 +46,18 @@ func (r *MemberRepository) GetMemberByID(ctx context.Context, id primitive.Objec
 	return member, nil
 }
 
-func (r *MemberRepository) GetMemberBySSN(ctx context.Context, ssn string) (model.Member, error) {
+func (r *MemberRepository) GetMemberBySSN(ctx context.Context, ssn string) (model.Member, error, int) {
 	var member model.Member
 	filter := bson.M{"_ssn": ssn}
 	err := r.collection.FindOne(ctx, filter).Decode(&member)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return model.Member{}, fmt.Errorf("member not found")
+			return model.Member{}, fmt.Errorf("member not found"), http.StatusNotFound
 		}
 		log.Printf("Error getting member by SSN: %v\n", err)
-		return model.Member{}, err
+		return model.Member{}, err, http.StatusInternalServerError
 	}
-	return member, nil
+	return member, nil, http.StatusOK
 }
 
 func (r *MemberRepository) GetAllMembers(ctx context.Context) ([]model.Member, error) {
@@ -76,15 +77,15 @@ func (r *MemberRepository) GetAllMembers(ctx context.Context) ([]model.Member, e
 	return members, nil
 }
 
-func (r *MemberRepository) UpdateMember(ctx context.Context, id primitive.ObjectID, updatedMember model.Member) error {
+func (r *MemberRepository) UpdateMember(ctx context.Context, id primitive.ObjectID, updatedMember model.Member) (error, int) {
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": updatedMember}
 	_, err := r.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Printf("Error updating member: %v\n", err)
-		return err
+		return err, http.StatusInternalServerError
 	}
-	return nil
+	return nil, http.StatusOK
 }
 
 func (r *MemberRepository) DeleteMember(ctx context.Context, id primitive.ObjectID) error {

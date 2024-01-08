@@ -28,9 +28,9 @@ func (c *MemberController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.memberService.RegisterMember(context.Background(), registrationDTO)
+	err, statusCode := c.memberService.RegisterMember(context.Background(), registrationDTO)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), statusCode)
 		return
 	}
 
@@ -45,9 +45,9 @@ func (c *MemberController) GetMemberBySSN(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	member, err := c.memberService.GetMemberBySSN(context.Background(), ssn)
+	member, err, statusCode := c.memberService.GetMemberBySSN(context.Background(), ssn)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, err.Error(), statusCode)
 		return
 	}
 
@@ -65,10 +65,10 @@ func (c *MemberController) UpdateBorrowCount(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	err = c.memberService.UpdateBorrowCount(context.Background(), updateDTO)
+	err, statusCode := c.memberService.UpdateBorrowCount(context.Background(), updateDTO)
 	if err != nil {
 		log.Printf("Error updating borrow count: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), statusCode)
 		return
 	}
 

@@ -8,6 +8,7 @@ import (
 	"library-app/central/model"
 	"library-app/central/repository"
 	"log"
+	"net/http"
 )
 
 type MemberService struct {
@@ -20,15 +21,18 @@ func NewMemberService(memberRepo *repository.MemberRepository) *MemberService {
 	}
 }
 
-func (s *MemberService) RegisterMember(ctx context.Context, registrationDTO dto.RegistrationDTO) error {
+func (s *MemberService) RegisterMember(ctx context.Context, registrationDTO dto.RegistrationDTO) (error, int) {
 
 	if isInvalidDTO(registrationDTO) {
-		return errors.New("All the fields are required.")
+		return errors.New("All the fields are required."), http.StatusBadRequest
 	}
 
-	existingMember, err := s.memberRepo.GetMemberBySSN(ctx, registrationDTO.SSN)
-	if existingMember.SSN == registrationDTO.SSN {
-		return fmt.Errorf("Member with SSN: %s already exists.", registrationDTO.SSN)
+	_, err, statusCode := s.memberRepo.GetMemberBySSN(ctx, registrationDTO.SSN)
+	if err != nil && statusCode != http.StatusNotFound {
+		return err, statusCode
+	}
+	if statusCode == http.StatusOK {
+		return fmt.Errorf("Member with SSN: %s already exists.", registrationDTO.SSN), http.StatusBadRequest
 	}
 
 	newMember := model.Member{
@@ -42,20 +46,20 @@ func (s *MemberService) RegisterMember(ctx context.Context, registrationDTO dto.
 	err = s.memberRepo.SaveMember(ctx, newMember)
 	if err != nil {
 		log.Printf("Error registering member: %v\n", err)
-		return err
+		return err, http.StatusInternalServerError
 	}
 	log.Printf("Registered new member: %s %s - SSN: %s\n", newMember.Name, newMember.Surname, newMember.SSN)
-	return nil
+	return nil, http.StatusCreated
 }
 
-func (s *MemberService) GetMemberBySSN(ctx context.Context, ssn string) (model.Member, error) {
+func (s *MemberService) GetMemberBySSN(ctx context.Context, ssn string) (model.Member, error, int) {
 	return s.memberRepo.GetMemberBySSN(ctx, ssn)
 }
 
-func (s *MemberService) UpdateBorrowCount(ctx context.Context, updateDTO dto.UpdateDTO) error {
-	member, err := s.memberRepo.GetMemberBySSN(ctx, updateDTO.SSN)
+func (s *MemberService) UpdateBorrowCount(ctx context.Context, updateDTO dto.UpdateDTO) (error, int) {
+	member, err, statusCode := s.memberRepo.GetMemberBySSN(ctx, updateDTO.SSN)
 	if err != nil {
-		return err
+		return errors.New("Member not found"), statusCode
 	}
 	member.BorrowCnt = updateDTO.NewCount
 	return s.memberRepo.UpdateMember(ctx, member.Id, member)
