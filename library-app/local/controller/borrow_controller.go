@@ -27,7 +27,7 @@ func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
 	var borrowDTO dto.BorrowDTO
 	err := json.NewDecoder(r.Body).Decode(&borrowDTO)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Invalid request body\n", http.StatusBadRequest)
 		return
 	}
 
@@ -38,7 +38,7 @@ func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Book borrowed successfully"))
+	w.Write([]byte("Book borrowed successfully\n"))
 }
 
 func (c *BorrowController) ReturnBook(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +46,7 @@ func (c *BorrowController) ReturnBook(w http.ResponseWriter, r *http.Request) {
 	var returnDTO dto.ReturnDTO
 	err := json.NewDecoder(r.Body).Decode(&returnDTO)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Invalid request body\n", http.StatusBadRequest)
 		return
 	}
 
@@ -57,5 +57,5 @@ func (c *BorrowController) ReturnBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Borrow successfully returned"))
+	w.Write([]byte("Borrow successfully returned\n"))
 }

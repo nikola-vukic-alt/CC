@@ -91,19 +91,19 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 // return type: (error, statusCode)
 func (s *BorrowService) ReturnBorrow(ctx context.Context, returnDTO dto.ReturnDTO) (error, int) {
 	if isInvalidReturn(returnDTO) {
-		return errors.New("All the fields are required."), http.StatusBadRequest
+		return errors.New("All the fields are required\n"), http.StatusBadRequest
 	}
 	client := &http.Client{}
 	member, err, _ := getMemberBySSN(returnDTO.SSN, client)
 	if err != nil {
-		return errors.New("Member not found"), http.StatusBadRequest
+		return errors.New("Member not found\n"), http.StatusBadRequest
 	}
 	borrow, err, _ := s.borrowRepo.GetMembersBorrow(ctx, member.Id, returnDTO.Title)
 	if err != nil {
-		return errors.New("Borrow not found"), http.StatusBadRequest
+		return errors.New("Borrow not found\n"), http.StatusBadRequest
 	}
 	if borrow.From.Before(borrow.To) {
-		return errors.New("You have already returned this borrow."), http.StatusBadRequest
+		return errors.New("You have already returned this borrow\n"), http.StatusBadRequest
 	}
 	borrow.To = time.Now()
 	err = s.borrowRepo.UpdateBorrow(ctx, borrow.Id, borrow)
@@ -139,22 +139,22 @@ func isInvalidDTO(borrowDTO dto.BorrowDTO) bool {
 func getMemberBySSN(ssn string, client *http.Client) (Member, error, int) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("http://central_library:8080/get?ssn=%s", ssn), nil)
 	if err != nil {
-		return Member{}, fmt.Errorf("Error creating HTTP request: %v", err), http.StatusInternalServerError
+		return Member{}, fmt.Errorf("Error creating HTTP request: %v\n", err), http.StatusInternalServerError
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return Member{}, fmt.Errorf("Error sending HTTP request: %v", err), resp.StatusCode
+		return Member{}, fmt.Errorf("Error sending HTTP request: %v\n", err), resp.StatusCode
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return Member{}, fmt.Errorf("Unexpected status code: %v", resp.StatusCode), resp.StatusCode
+		return Member{}, fmt.Errorf("Unexpected status code: %v\n", resp.StatusCode), resp.StatusCode
 	}
 
 	var m Member
 	if err := json.NewDecoder(resp.Body).Decode(&m); err != nil {
-		return Member{}, fmt.Errorf("Error decoding response body: %v", err), http.StatusInternalServerError
+		return Member{}, fmt.Errorf("Error decoding response body: %v\n", err), http.StatusInternalServerError
 	}
 
 	return m, nil, http.StatusOK
@@ -170,24 +170,24 @@ func updateBorrowCount(member Member, client *http.Client, shouldIncrease bool) 
 	}
 	requestBody, err := json.Marshal(updateDTO)
 	if err != nil {
-		return fmt.Errorf("Error encoding UpdateDTO into JSON: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("Error encoding UpdateDTO into JSON: %v\n", err), http.StatusInternalServerError
 	}
 
 	req, err := http.NewRequest("PUT", "http://central_library:8080/update-borrow-count", bytes.NewBuffer(requestBody))
 	if err != nil {
-		return fmt.Errorf("Error creating HTTP request: %v", err), http.StatusInternalServerError
+		return fmt.Errorf("Error creating HTTP request: %v\n", err), http.StatusInternalServerError
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("Error sending HTTP request: %v", err), resp.StatusCode
+		return fmt.Errorf("Error sending HTTP request: %v\n", err), resp.StatusCode
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Unexpected status code: %v", resp.StatusCode), resp.StatusCode
+		return fmt.Errorf("Unexpected status code: %v\n", resp.StatusCode), resp.StatusCode
 	}
 	return nil, http.StatusOK
 }

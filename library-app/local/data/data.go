@@ -10,7 +10,7 @@ var Borrows = []*model.Borrow{
 	{
 		Id:     getObjectId("62706d1b624b3da748f63fe3"),
 		Title:  "War and Peace",
-		Author: "F. M. Dostoyevsky",
+		Author: "F. M. Dostoevsky",
 		ISBN:   "978-3-16-148410-0",
 	},
 	{

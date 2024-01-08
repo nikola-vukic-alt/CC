@@ -24,7 +24,7 @@ func (c *MemberController) Register(w http.ResponseWriter, r *http.Request) {
 	var registrationDTO dto.RegistrationDTO
 	err := json.NewDecoder(r.Body).Decode(&registrationDTO)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Invalid request body\n", http.StatusBadRequest)
 		return
 	}
 
@@ -35,7 +35,7 @@ func (c *MemberController) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Member successfully registered"))
+	w.Write([]byte("Member successfully registered\n"))
 }
 
 func (c *MemberController) GetMemberBySSN(w http.ResponseWriter, r *http.Request) {

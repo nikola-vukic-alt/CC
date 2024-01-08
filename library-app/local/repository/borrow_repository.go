@@ -40,7 +40,7 @@ func (r *BorrowRepository) GetMembersBorrow(ctx context.Context, memberId primit
 	err := r.collection.FindOne(ctx, filter).Decode(&borrow)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return model.Borrow{}, fmt.Errorf("Borrow not found"), http.StatusNotFound
+			return model.Borrow{}, fmt.Errorf("Borrow not found\n"), http.StatusNotFound
 		}
 		log.Printf("Error getting borrow: %v\n", err)
 		return model.Borrow{}, err, http.StatusBadRequest
