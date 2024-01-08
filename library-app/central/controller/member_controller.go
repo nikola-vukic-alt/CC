@@ -20,6 +20,7 @@ func NewMemberController(memberService *service.MemberService) *MemberController
 }
 
 func (c *MemberController) Register(w http.ResponseWriter, r *http.Request) {
+	log.Println("Registration request received by the central library.")
 	var registrationDTO dto.RegistrationDTO
 	err := json.NewDecoder(r.Body).Decode(&registrationDTO)
 	if err != nil {

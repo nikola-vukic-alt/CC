@@ -44,7 +44,7 @@ func (s *MemberService) RegisterMember(ctx context.Context, registrationDTO dto.
 		log.Printf("Error registering member: %v\n", err)
 		return err
 	}
-
+	log.Printf("Registered new member: %s %s - SSN: %s\n", newMember.Name, newMember.Surname, newMember.SSN)
 	return nil
 }
 

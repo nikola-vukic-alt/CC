@@ -1,0 +1,106 @@
+version: '3'
+services:
+  central_library:
+    image: central
+    container_name: central_library
+    build:
+      context: .
+      dockerfile: ./library-app/central/Dockerfile
+    restart: on-failure
+    ports:
+      - 8080:8080
+    depends_on:
+      - central_db
+    networks:
+      - network
+  
+  ns_library:
+    image: ns
+    container_name: ns_library
+    build:
+      context: .
+      dockerfile: ./library-app/local/Dockerfile
+    restart: on-failure
+    ports:
+      - 8081:8081
+    depends_on:
+      - ns_db
+    environment:
+      - LOCAL_DB_HOST=ns_db
+      - LOCAL_NAME=Novi Sad
+    networks:
+      - network
+
+  bg_library:
+    image: bg
+    container_name: bg_library
+    build:
+      context: .
+      dockerfile: ./library-app/local/Dockerfile
+    restart: on-failure
+    ports:
+      - 8082:8081
+    depends_on:
+      - bg_db
+    environment:
+    - LOCAL_DB_HOST=bg_db
+    - LOCAL_NAME=Belgrade
+    networks:
+      - network
+
+  nis_library:
+    image: nis
+    container_name: nis_library
+    build:
+      context: .
+      dockerfile: ./library-app/local/Dockerfile
+    restart: on-failure
+    ports:
+      - 8083:8081
+    depends_on:
+      - nis_db
+    environment:
+      - LOCAL_DB_HOST=nis_db
+      - LOCAL_NAME=Nis
+    networks:
+      - network
+
+  central_db:
+    image: mongo
+    container_name: central_db
+    restart: on-failure
+    ports:
+      - 27017:27017
+    networks:
+      - network
+
+  ns_db:
+    image: mongo
+    container_name: ns_db
+    restart: on-failure
+    ports:
+      - 27018:27017
+    networks:
+      - network
+
+  bg_db:
+    image: mongo
+    container_name: bg_db
+    restart: on-failure
+    ports:
+      - 27019:27017
+    networks:
+      - network
+  
+  nis_db:
+    image: mongo
+    container_name: nis_db
+    restart: on-failure
+    ports:
+      - 27020:27017
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge

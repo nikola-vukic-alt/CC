@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"library-app/local/controller"
 	"library-app/local/repository"
 	"library-app/local/service"
@@ -16,11 +17,13 @@ import (
 )
 
 func main() {
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	connectionURI := fmt.Sprintf("mongodb://%s:27017", os.Getenv("LOCAL_DB_HOST"))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connectionURI))
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB:", err)
 	}
+	libName := os.Getenv("LOCAL_NAME")
+	log.Printf("Connected to the %s library.\n", libName)
 	defer client.Disconnect(context.Background())
 
 	borrows_database := client.Database("borrows")
@@ -38,7 +41,7 @@ func main() {
 	}
 
 	go func() {
-		log.Println("Local library server listening on :8081")
+		log.Println("Local library server up and running")
 		if err := server.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}

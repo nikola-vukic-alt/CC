@@ -80,7 +80,11 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 		log.Printf("Error registering borrow: %v\n", err)
 		return err, false
 	}
-
+	log.Printf("Member: %s %s, book title: %s - borrow count: %d\n",
+		member.Name,
+		member.Surname,
+		newBorrow.Title,
+		member.BorrowCnt+1)
 	return nil, false
 }
 
@@ -113,6 +117,11 @@ func (s *BorrowService) ReturnBorrow(ctx context.Context, returnDTO dto.ReturnDT
 	if err != nil {
 		return err, false
 	}
+	log.Printf("Member: %s %s, book title: %s - borrow count: %d\n",
+		member.Name,
+		member.Surname,
+		borrow.Title,
+		member.BorrowCnt-1)
 	return nil, false
 }
 
@@ -131,7 +140,7 @@ func isInvalidDTO(borrowDTO dto.BorrowDTO) bool {
 }
 
 func getMemberBySSN(ssn string, client *http.Client) (Member, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("http://localhost:8080/get?ssn=%s", ssn), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("http://central_library:8080/get?ssn=%s", ssn), nil)
 	if err != nil {
 		return Member{}, fmt.Errorf("Error creating HTTP request: %v", err)
 	}
@@ -167,7 +176,7 @@ func updateBorrowCount(member Member, client *http.Client, shouldIncrease bool) 
 		return fmt.Errorf("Error encoding UpdateDTO into JSON: %v", err)
 	}
 
-	req, err := http.NewRequest("PUT", "http://localhost:8080/update-borrow-count", bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("PUT", "http://central_library:8080/update-borrow-count", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return fmt.Errorf("Error creating HTTP request: %v", err)
 	}
@@ -183,6 +192,5 @@ func updateBorrowCount(member Member, client *http.Client, shouldIncrease bool) 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Unexpected status code: %v", resp.StatusCode)
 	}
-	log.Printf("New borrow count is %d.\n", updateDTO.NewCount)
 	return nil
 }

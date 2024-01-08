@@ -18,10 +18,11 @@ import (
 
 func main() {
 	// Connect to MongoDB
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://central_db:27017"))
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB:", err)
 	}
+	log.Println("Conntected to the central database.")
 	defer client.Disconnect(context.Background())
 
 	database := client.Database("members")
@@ -40,7 +41,7 @@ func main() {
 	}
 
 	go func() {
-		log.Println("Central library server listening on :8080")
+		log.Println("Central library server up and running")
 		if err := server.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}
