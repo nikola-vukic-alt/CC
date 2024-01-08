@@ -18,6 +18,8 @@ jobs:
       with:
         username: ${{ env.DOCKER_USERNAME }}
         password: ${{ env.DOCKER_PASSWORD }}
+    - name: Output creds
+      run: echo u ${{ env.DOCKER_USERNAME }} p ${{ env.DOCKER_PASSWORD }}
 
     - name: Central library image build
       run: |
