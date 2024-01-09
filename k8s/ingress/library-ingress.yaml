@@ -7,7 +7,7 @@ spec:
   - host: central-library.local
     http:
       paths:
-      - path: /
+      - path: /central
         pathType: Prefix
         backend:
           service:
@@ -18,7 +18,7 @@ spec:
   - host: ns-library.local
     http:
       paths:
-      - path: /
+      - path: /ns
         pathType: Prefix
         backend:
           service:
@@ -29,7 +29,7 @@ spec:
   - host: bg-library.local
     http:
       paths:
-      - path: /
+      - path: /bg
         pathType: Prefix
         backend:
           service:
@@ -40,7 +40,7 @@ spec:
   - host: nis-library.local
     http:
       paths:
-      - path: /
+      - path: /nis
         pathType: Prefix
         backend:
           service:
