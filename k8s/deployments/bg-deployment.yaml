@@ -18,8 +18,8 @@ spec:
           ports:
             - containerPort: 8081
           envFrom:
-              - configMapRef:
-                  name: bg-library-config
+            - configMapRef:
+                name: bg-library-config
         - name: bg-db
           image: mongo
           ports:

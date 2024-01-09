@@ -33,6 +33,3 @@ kubectl delete -f k8s/config/nis-config.yaml
 echo
 
 echo "All resources stopped."
-
-# Stop the minikube
-minikube stop

@@ -18,8 +18,8 @@ spec:
           ports:
             - containerPort: 8081
           envFrom:
-              - configMapRef:
-                  name: ns-library-config
+            - configMapRef:
+                name: ns-library-config
         - name: ns-db
           image: mongo
           ports:

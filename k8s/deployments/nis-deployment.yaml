@@ -18,8 +18,8 @@ spec:
           ports:
             - containerPort: 8081
           envFrom:
-              - configMapRef:
-                  name: nis-library-config
+            - configMapRef:
+                name: nis-library-config
         - name: nis-db
           image: mongo
           ports:

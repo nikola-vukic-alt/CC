@@ -18,8 +18,12 @@ import (
 )
 
 func main() {
+	host, didReturn := os.LookupEnv("CENTRAL_DB")
+	if !didReturn {
+		host = "localhost"
+	}
 	// Connect to MongoDB
-	connectionURI := (fmt.Sprintf("mongodb://%s:27017", os.Getenv("CENTRAL_DB")))
+	connectionURI := (fmt.Sprintf("mongodb://%s:27017", host))
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connectionURI))
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB:", err)

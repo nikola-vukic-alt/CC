@@ -18,8 +18,8 @@ spec:
           ports:
             - containerPort: 8080
           envFrom:
-              - configMapRef:
-                  name: central-library-config
+            - configMapRef:
+                name: central-library-config
         - name: central-db
           image: mongo
           ports:
