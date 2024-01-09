@@ -1,7 +1,7 @@
 ### E2 68-2023 Nikola Vukic
 Start and test the application with 
 ```shell 
-chmod +x test.sh && ./test.sh
+chmod +x test-a.sh && ./test-a.sh
 ``` 
 command (from root directory).\
 The script will run *docker compose up*, starting the application, and then send various requests.\
