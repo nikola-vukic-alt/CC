@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: central-host-pv
+spec:
+ capacity:
+   storage: 512Mi
+ volumeMode: Filesystem
+ storageClassName: standard
+ accessModes:
+   - ReadWriteOnce
+ hostPath:
+   path: /central-data
+   type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: central-host-pvc
+spec:
+ volumeName: central-host-pv
+ accessModes:
+   - ReadWriteOnce
+ storageClassName: standard
+ resources:
+   requests:
+     storage: 512Mi

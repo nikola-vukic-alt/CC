@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nis-library-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nis-library
+  template:
+    metadata:
+      labels:
+        app: nis-library
+    spec:
+      containers:
+        - name: nis-library
+          image: nikolavukicalt/local-lib:v1
+          ports:
+            - containerPort: 8081
+        - name: nis-db
+          image: mongo
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - mountPath: /data/db
+              name: nis-db
+      volumes:
+        - name: nis-db
+          persistentVolumeClaim:
+            claimName: nis-host-pvc

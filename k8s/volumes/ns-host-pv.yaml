@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+ name: ns-host-pv
+spec:
+ capacity:
+   storage: 256Mi
+ volumeMode: Filesystem
+ storageClassName: standard
+ accessModes:
+   - ReadWriteOnce
+ hostPath:
+   path: /ns-data
+   type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: ns-host-pvc
+spec:
+ volumeName: ns-host-pv
+ accessModes:
+   - ReadWriteOnce
+ storageClassName: standard
+ resources:
+   requests:
+     storage: 256Mi

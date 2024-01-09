@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: central-library-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: central-library
+  template:
+    metadata:
+      labels:
+        app: central-library
+    spec:
+      containers:
+        - name: central-library
+          image: nikolavukicalt/central-lib:v1
+          ports:
+            - containerPort: 8080
+        - name: central-db
+          image: mongo
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - mountPath: /data/db
+              name: central-db
+      volumes:
+        - name: central-db
+          persistentVolumeClaim:
+            claimName: central-host-pvc

@@ -1,0 +1,49 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: library-ingress
+spec:
+  rules:
+  - host: central-library.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: central-library-service
+            port:
+              number: 8080
+
+  - host: ns-library.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ns-library-service
+            port:
+              number: 8081
+
+  - host: bg-library.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bg-library-service
+            port:
+              number: 8081
+
+  - host: nis-library.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nis-library-service
+            port:
+              number: 8081
