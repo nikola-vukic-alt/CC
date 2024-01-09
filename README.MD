@@ -1,4 +1,6 @@
 ### E2 68-2023 Nikola Vukic
+
+#### A
 Start and test the application with 
 ```shell 
 chmod +x test-a.sh && ./test-a.sh
@@ -17,3 +19,11 @@ It will test for:
 
 The results will be displayed in terminal.\
 After finishing all the tests it will run *docker compose down*.
+
+#### B
+Deploy the application to minikube local cluster with
+```shell
+chmod +x k8s/bash/deploy-b.sh && ./k8s/bash/deploy-b.sh
+```
+command (from root directory).\
+The script will apply *volumes, claims, deployments, service* and *ingress*.

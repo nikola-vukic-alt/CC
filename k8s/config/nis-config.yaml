@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nis-library-config
+data:
+  LOCAL_DB_HOST: localhost
+  LOCAL_NAME: Nis
+  CENTRAL_LIBRARY: localhost

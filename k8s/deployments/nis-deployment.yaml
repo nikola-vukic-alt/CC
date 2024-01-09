@@ -17,6 +17,9 @@ spec:
           image: nikolavukicalt/local-lib:v1
           ports:
             - containerPort: 8081
+          envFrom:
+              - configMapRef:
+                  name: nis-library-config
         - name: nis-db
           image: mongo
           ports:

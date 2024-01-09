@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bg-library-config
+data:
+  LOCAL_DB_HOST: localhost
+  LOCAL_NAME: Belgrade
+  CENTRAL_LIBRARY: localhost

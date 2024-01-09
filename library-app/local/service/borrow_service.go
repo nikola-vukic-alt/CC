@@ -11,6 +11,7 @@ import (
 	"library-app/local/repository"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -153,7 +154,7 @@ func isInvalidDTO(borrowDTO dto.BorrowDTO) bool {
 }
 
 func getMemberBySSN(ssn string, client *http.Client) (Member, error, int) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("http://central_library:8080/get?ssn=%s", ssn), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:8080/get?ssn=%s", ssn, os.Getenv("CENTRAL_LIBRARY")), nil)
 	if err != nil {
 		return Member{}, fmt.Errorf("Error creating HTTP request: %v\n", err), http.StatusInternalServerError
 	}
@@ -189,7 +190,7 @@ func updateBorrowCount(member Member, client *http.Client, shouldIncrease bool) 
 		return fmt.Errorf("Error encoding UpdateDTO into JSON: %v\n", err), http.StatusInternalServerError
 	}
 
-	req, err := http.NewRequest("PUT", "http://central_library:8080/update-borrow-count", bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%s:8080/update-borrow-count", os.Getenv("CENTRAL_LIBRARY")), bytes.NewBuffer(requestBody))
 	if err != nil {
 		return fmt.Errorf("Error creating HTTP request: %v\n", err), http.StatusInternalServerError
 	}

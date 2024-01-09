@@ -17,6 +17,9 @@ spec:
           image: nikolavukicalt/central-lib:v1
           ports:
             - containerPort: 8080
+          envFrom:
+              - configMapRef:
+                  name: central-library-config
         - name: central-db
           image: mongo
           ports:

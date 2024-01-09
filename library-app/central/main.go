@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -18,7 +19,8 @@ import (
 
 func main() {
 	// Connect to MongoDB
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://central_db:27017"))
+	connectionURI := (fmt.Sprintf("mongodb://%s:27017", os.Getenv("CENTRAL_DB")))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connectionURI))
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB:", err)
 	}

@@ -4,10 +4,10 @@ metadata:
   name: library-ingress
 spec:
   rules:
-  - host: central-library.local
+  - host: central.library
     http:
       paths:
-      - path: /central
+      - path: /
         pathType: Prefix
         backend:
           service:
@@ -15,10 +15,10 @@ spec:
             port:
               number: 8080
 
-  - host: ns-library.local
+  - host: ns.library
     http:
       paths:
-      - path: /ns
+      - path: /
         pathType: Prefix
         backend:
           service:
@@ -26,10 +26,10 @@ spec:
             port:
               number: 8081
 
-  - host: bg-library.local
+  - host: bg.library
     http:
       paths:
-      - path: /bg
+      - path: /
         pathType: Prefix
         backend:
           service:
@@ -37,10 +37,10 @@ spec:
             port:
               number: 8081
 
-  - host: nis-library.local
+  - host: nis.library
     http:
       paths:
-      - path: /nis
+      - path: /
         pathType: Prefix
         backend:
           service:

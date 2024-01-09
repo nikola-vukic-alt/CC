@@ -8,6 +8,8 @@ services:
       - 8080:8080
     depends_on:
       - central_db
+    environment:
+      - CENTRAL_DB=central_db
     networks:
       - network
   
@@ -22,6 +24,7 @@ services:
     environment:
       - LOCAL_DB_HOST=ns_db
       - LOCAL_NAME=Novi Sad
+      - CENTRAL_LIBRARY=central_library
     networks:
       - network
 
@@ -36,6 +39,7 @@ services:
     environment:
       - LOCAL_DB_HOST=bg_db
       - LOCAL_NAME=Belgrade
+      - CENTRAL_LIBRARY=central_library
     networks:
       - network
 
@@ -50,6 +54,7 @@ services:
     environment:
       - LOCAL_DB_HOST=nis_db
       - LOCAL_NAME=Nis
+      - CENTRAL_LIBRARY=central_library
     networks:
       - network
 
