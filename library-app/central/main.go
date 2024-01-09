@@ -18,10 +18,12 @@ import (
 )
 
 func main() {
-	host, didReturn := os.LookupEnv("CENTRAL_DB")
-	if !didReturn {
-		host = "localhost"
-	}
+	// host, didReturn := os.LookupEnv("CENTRAL_DB")
+	// if !didReturn {
+	// 	log.Println("Env did not return variable name.")
+	// 	host = "localhost"
+	// }
+	host := "localhost"
 	// Connect to MongoDB
 	connectionURI := (fmt.Sprintf("mongodb://%s:27017", host))
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connectionURI))
