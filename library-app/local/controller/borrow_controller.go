@@ -1,8 +1,11 @@
 package controller
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"library-app/local/dto"
 	"library-app/local/service"
 	"log"
@@ -31,20 +34,29 @@ func (c *BorrowController) RegisterMember(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err, statusCode, newMember := c.borrowService.RegisterMember(context.Background(), registrationDTO)
+	jsonBody, err := json.Marshal(registrationDTO)
 	if err != nil {
-		http.Error(w, err.Error(), statusCode)
+		log.Println("Error marshalling JSON:", err)
 		return
 	}
 
-	responseJSON, err := json.Marshal(newMember)
+	endpoint := fmt.Sprintf("http://%s:8080/register", os.Getenv("CENTRAL_LIBRARY"))
+
+	resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(jsonBody))
 	if err != nil {
-		http.Error(w, "Error encoding response body", http.StatusInternalServerError)
+		log.Println("Error sending POST request:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Error reading response body:", err)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	w.Write(responseJSON)
+	w.Write(bodyBytes)
 }
 
 func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {

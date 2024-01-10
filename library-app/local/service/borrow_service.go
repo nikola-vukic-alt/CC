@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"library-app/local/dto"
 	"library-app/local/model"
 	"library-app/local/repository"
@@ -42,50 +41,29 @@ func NewBorrowService(borrowRepo *repository.BorrowRepository) *BorrowService {
 	}
 }
 
-func (s *BorrowService) RegisterMember(ctx context.Context, registrationDTO dto.RegistrationDTO) (error, int, dto.MemberDTO) {
-	jsonBody, err := json.Marshal(registrationDTO)
-	if err != nil {
-		log.Println("Error marshalling JSON:", err)
-		return err, http.StatusInternalServerError, dto.MemberDTO{}
-	}
+// func (s *BorrowService) RegisterMember(ctx context.Context, registrationDTO dto.RegistrationDTO) string {
+// 	jsonBody, err := json.Marshal(registrationDTO)
+// 	if err != nil {
+// 		log.Println("Error marshalling JSON:", err)
+// 		return err.Error()
+// 	}
 
-	endpoint := fmt.Sprintf("http://%s:8080/register", os.Getenv("CENTRAL_LIBRARY"))
+// 	endpoint := fmt.Sprintf("http://%s:8080/register", os.Getenv("CENTRAL_LIBRARY"))
 
-	resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(jsonBody))
-	if err != nil {
-		log.Println("Error sending POST request:", err)
-		return err, http.StatusInternalServerError, dto.MemberDTO{}
-	}
-	defer resp.Body.Close()
+// 	resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(jsonBody))
+// 	if err != nil {
+// 		log.Println("Error sending POST request:", err)
+// 		return err.Error()
+// 	}
+// 	defer resp.Body.Close()
 
-	if resp.ContentLength == 0 {
-		log.Println("Empty response body")
-		return nil, http.StatusInternalServerError, dto.MemberDTO{}
-	}
-
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return err, http.StatusInternalServerError, dto.MemberDTO{}
-	}
-	log.Println("Response Body:", string(bodyBytes))
-
-	resp.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
-
-	var response struct {
-		Error  error         `json:"error"`
-		Code   int           `json:"code"`
-		Member dto.MemberDTO `json:"member"`
-	}
-
-	err = json.NewDecoder(resp.Body).Decode(&response)
-	if err != nil {
-		log.Println("Error decoding JSON response:", err)
-		return err, http.StatusInternalServerError, dto.MemberDTO{}
-	}
-
-	return response.Error, response.Code, response.Member
-}
+// 	bodyBytes, err := io.ReadAll(resp.Body)
+// 	if err != nil {
+// 		fmt.Println("Error reading response body:", err)
+// 		return err.E
+// 	}
+// 	return string(bodyBytes)
+// }
 
 // return type: (error, statusCode)
 func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.BorrowDTO) (error, int, dto.DetailedBorrowDTO) {
