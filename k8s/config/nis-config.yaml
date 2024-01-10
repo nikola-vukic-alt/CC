@@ -5,4 +5,4 @@ metadata:
 data:
   LOCAL_DB_HOST: localhost
   LOCAL_NAME: Nis
-  CENTRAL_LIBRARY: localhost
+  CENTRAL_LIBRARY: central-library-service

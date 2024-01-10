@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ns-library
-          image: nikolavukicalt/local-lib:v1
+          image: nikolavukicalt/local-lib:latest
           ports:
             - containerPort: 8081
           envFrom:

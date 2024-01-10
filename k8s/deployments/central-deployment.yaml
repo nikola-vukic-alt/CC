@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: central-library
-          image: nikolavukicalt/central-lib:v1
+          image: nikolavukicalt/central-lib:latest
           ports:
             - containerPort: 8080
           envFrom:

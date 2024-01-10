@@ -1,7 +1,7 @@
 version: '3'
 services:
   central_library:
-    image: nikolavukicalt/central-lib:v1
+    image: nikolavukicalt/central-lib:latest
     container_name: central_library
     restart: on-failure
     ports:
@@ -14,7 +14,7 @@ services:
       - network
   
   ns_library:
-    image: nikolavukicalt/local-lib:v1
+    image: nikolavukicalt/local-lib:latest
     container_name: ns_library
     restart: on-failure
     ports:
@@ -29,7 +29,7 @@ services:
       - network
 
   bg_library:
-    image: nikolavukicalt/local-lib:v1
+    image: nikolavukicalt/local-lib:latest
     container_name: bg_library
     restart: on-failure
     ports:
@@ -44,7 +44,7 @@ services:
       - network
 
   nis_library:
-    image: nikolavukicalt/local-lib:v1
+    image: nikolavukicalt/local-lib:latest
     container_name: nis_library
     restart: on-failure
     ports:

@@ -23,14 +23,14 @@ jobs:
     
     - name: Central library image build
       run: |
-        docker build -t nikolavukicalt/central-lib:v1 ./library-app/central
+        docker build -t nikolavukicalt/central-lib:latest ./library-app/central
 
     - name: Central library image push
-      run: docker push nikolavukicalt/central-lib:v1
+      run: docker push nikolavukicalt/central-lib:latest
 
     - name: Local library image build
       run: |
-        docker build -t nikolavukicalt/local-lib:v1 ./library-app/local
+        docker build -t nikolavukicalt/local-lib:latest ./library-app/local
 
     - name: Local library image push
-      run: docker push nikolavukicalt/local-lib:v1
+      run: docker push nikolavukicalt/local-lib:latest
