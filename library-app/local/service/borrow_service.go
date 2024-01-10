@@ -41,6 +41,36 @@ func NewBorrowService(borrowRepo *repository.BorrowRepository) *BorrowService {
 	}
 }
 
+func (s *BorrowService) RegisterMember(ctx context.Context, registrationDTO dto.RegistrationDTO) (error, int, dto.MemberDTO) {
+	jsonBody, err := json.Marshal(registrationDTO)
+	if err != nil {
+		fmt.Println("Error marshalling JSON:", err)
+		return err, http.StatusInternalServerError, dto.MemberDTO{}
+	}
+
+	endpoint := fmt.Sprintf("http://%s:8080/register", os.Getenv("CENTRAL_LIBRARY"))
+	resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(jsonBody))
+	if err != nil {
+		fmt.Println("Error sending POST request:", err)
+		return err, http.StatusInternalServerError, dto.MemberDTO{}
+	}
+	defer resp.Body.Close()
+
+	var response struct {
+		Error  error         `json:"error"`
+		Code   int           `json:"code"`
+		Member dto.MemberDTO `json:"member"`
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		fmt.Println("Error decoding JSON response:", err)
+		return err, http.StatusInternalServerError, dto.MemberDTO{}
+	}
+
+	return response.Error, response.Code, response.Member
+}
+
 // return type: (error, statusCode)
 func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.BorrowDTO) (error, int, dto.DetailedBorrowDTO) {
 	if isInvalidDTO(borrowDTO) {
@@ -154,22 +184,12 @@ func isInvalidDTO(borrowDTO dto.BorrowDTO) bool {
 }
 
 func getMemberBySSN(ssn string, client *http.Client) (Member, error, int) {
-	host := os.Getenv("CENTRAL_LIBRARY")
-	log.Printf("Central host: %s\n", host)
-	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:8080/get?ssn=%s", host, ssn), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:8080/get?ssn=%s", os.Getenv("CENTRAL_LIBRARY"), ssn), nil)
 	if err != nil {
 		return Member{}, fmt.Errorf("Error creating HTTP request: %v\n", err), http.StatusInternalServerError
 	}
-	if req == nil {
-		log.Println("Request is null")
-	}
-	if client == nil {
-		log.Println("Client is null")
-	}
+
 	resp, err := client.Do(req)
-	if resp == nil {
-		log.Println("Responsne is null")
-	}
 	if err != nil {
 		return Member{}, fmt.Errorf("Error sending HTTP request: %v\n", err), resp.StatusCode
 	}

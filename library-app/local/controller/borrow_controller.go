@@ -22,6 +22,31 @@ func NewBorrowController(borrowService *service.BorrowService) *BorrowController
 	}
 }
 
+func (c *BorrowController) RegisterMember(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Register request received by the %s library.\n", os.Getenv("LOCAL_NAME"))
+	var registrationDTO dto.RegistrationDTO
+	err := json.NewDecoder(r.Body).Decode(&registrationDTO)
+	if err != nil {
+		http.Error(w, "Invalid request body\n", http.StatusBadRequest)
+		return
+	}
+
+	err, statusCode, newMember := c.borrowService.RegisterMember(context.Background(), registrationDTO)
+	if err != nil {
+		http.Error(w, err.Error(), statusCode)
+		return
+	}
+
+	responseJSON, err := json.Marshal(newMember)
+	if err != nil {
+		http.Error(w, "Error encoding response body", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(responseJSON)
+}
+
 func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Borrow request received by the %s library.\n", os.Getenv("LOCAL_NAME"))
 	var borrowDTO dto.BorrowDTO
