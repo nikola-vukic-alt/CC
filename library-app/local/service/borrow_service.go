@@ -160,7 +160,12 @@ func getMemberBySSN(ssn string, client *http.Client) (Member, error, int) {
 	if err != nil {
 		return Member{}, fmt.Errorf("Error creating HTTP request: %v\n", err), http.StatusInternalServerError
 	}
-
+	if req == nil {
+		log.Println("Request is null")
+	}
+	if client == nil {
+		log.Println("Client is null")
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return Member{}, fmt.Errorf("Error sending HTTP request: %v\n", err), resp.StatusCode
