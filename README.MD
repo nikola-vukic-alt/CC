@@ -26,4 +26,20 @@ Deploy the application to minikube local cluster with
 chmod +x k8s/bash/deploy-b.sh && ./k8s/bash/deploy-b.sh
 ```
 command (from root directory).\
-The script will apply *volumes, claims, deployments, service* and *ingress*.
+The script will apply *volumes, claims, deployments, service* and *ingress*.\
+Check if ingress was created succesfully there should be this message in the terminal:\
+**ingress.networking.k8s.io/library-ingress created**
+If it was not created successfully run the following command until it's created successfully:
+```shell
+kubectl apply -f k8s/ingress/library-ingress.yaml
+```
+After that start the dashboard and wait until the ingress gets its endpoint:
+```shell
+minikube dashboard
+```
+After the endpoint for ingress has appeared on the dashboard run:
+```shell 
+chmod +x test-b.sh && ./test-b.sh
+``` 
+The script will send all the same requests as in **A** part but towards kubernetes cluster.
+After testing that the application is working correctly it will stop all the deployments.

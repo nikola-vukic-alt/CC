@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Start the minikube
+# Delete and Start the Minikube to delete existing volumes
+minikube delete
 minikube start
 
 # Apply Configs
