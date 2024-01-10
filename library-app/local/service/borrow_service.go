@@ -44,6 +44,7 @@ func NewBorrowService(borrowRepo *repository.BorrowRepository) *BorrowService {
 
 // return type: (error, statusCode)
 func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.BorrowDTO) (error, int, dto.DetailedBorrowDTO) {
+	log.Println("Got to service...")
 	if isInvalidDTO(borrowDTO) {
 		return errors.New("All the fields are required."), http.StatusBadRequest, dto.DetailedBorrowDTO{}
 	}
