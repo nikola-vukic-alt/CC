@@ -27,7 +27,7 @@ func (c *MemberController) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body\n", http.StatusBadRequest)
 		return
 	}
-
+	
 	err, statusCode, newMember := c.memberService.RegisterMember(context.Background(), registrationDTO)
 	if err != nil {
 		http.Error(w, err.Error(), statusCode)

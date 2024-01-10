@@ -64,10 +64,11 @@ func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
 	var borrowDTO dto.BorrowDTO
 	err := json.NewDecoder(r.Body).Decode(&borrowDTO)
 	if err != nil {
+		log.Printf("Error: SSN - %s\n", borrowDTO.SSN)
 		http.Error(w, "Invalid request body\n", http.StatusBadRequest)
 		return
 	}
-
+	log.Println("Trying to create a new borrow...")
 	err, statusCode, newBorrow := c.borrowService.CreateNewBorrow(context.Background(), borrowDTO)
 	if err != nil {
 		http.Error(w, err.Error(), statusCode)
