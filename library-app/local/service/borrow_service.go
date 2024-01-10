@@ -41,30 +41,6 @@ func NewBorrowService(borrowRepo *repository.BorrowRepository) *BorrowService {
 	}
 }
 
-// func (s *BorrowService) RegisterMember(ctx context.Context, registrationDTO dto.RegistrationDTO) string {
-// 	jsonBody, err := json.Marshal(registrationDTO)
-// 	if err != nil {
-// 		log.Println("Error marshalling JSON:", err)
-// 		return err.Error()
-// 	}
-
-// 	endpoint := fmt.Sprintf("http://%s:8080/register", os.Getenv("CENTRAL_LIBRARY"))
-
-// 	resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(jsonBody))
-// 	if err != nil {
-// 		log.Println("Error sending POST request:", err)
-// 		return err.Error()
-// 	}
-// 	defer resp.Body.Close()
-
-// 	bodyBytes, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		fmt.Println("Error reading response body:", err)
-// 		return err.E
-// 	}
-// 	return string(bodyBytes)
-// }
-
 // return type: (error, statusCode)
 func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.BorrowDTO) (error, int, dto.DetailedBorrowDTO) {
 	if isInvalidDTO(borrowDTO) {
@@ -80,11 +56,11 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 	if member.BorrowCnt > 2 {
 		return errors.New("Member is already borrowing three books."), http.StatusBadRequest, dto.DetailedBorrowDTO{}
 	}
-	_, err, statusCode = s.borrowRepo.GetMembersBorrow(ctx, member.Id, borrowDTO.Title)
+	borrow, err, statusCode := s.borrowRepo.GetMembersBorrow(ctx, member.Id, borrowDTO.Title)
 	if err != nil && statusCode != http.StatusNotFound {
 		return err, statusCode, dto.DetailedBorrowDTO{}
 	}
-	if statusCode == http.StatusOK {
+	if statusCode == http.StatusOK && borrow.To.Before(borrow.From) {
 		return errors.New("You have already borrowed this book."), http.StatusBadRequest, dto.DetailedBorrowDTO{}
 	}
 	err, statusCode = updateBorrowCount(member, client, true)
