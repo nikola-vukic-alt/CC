@@ -32,6 +32,7 @@ func main() {
 	borrowController := controller.NewBorrowController(borrowService)
 
 	router := http.NewServeMux()
+	router.HandleFunc("/register", borrowController.RegisterMember)
 	router.HandleFunc("/borrow", borrowController.BorrowBook)
 	router.HandleFunc("/return", borrowController.ReturnBook)
 
