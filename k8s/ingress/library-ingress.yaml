@@ -4,17 +4,6 @@ metadata:
   name: library-ingress
 spec:
   rules:
-  - host: central.library
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: central-library-service
-            port:
-              number: 8080
-
   - host: ns.library
     http:
       paths:
