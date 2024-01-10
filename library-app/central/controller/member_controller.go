@@ -50,7 +50,7 @@ func (c *MemberController) GetMemberBySSN(w http.ResponseWriter, r *http.Request
 		http.Error(w, "SSN parameter is required", http.StatusBadRequest)
 		return
 	}
-
+	log.Println("Membership check request received by the central library.")
 	member, err, statusCode := c.memberService.GetMemberBySSN(context.Background(), ssn)
 	if err != nil {
 		http.Error(w, err.Error(), statusCode)
