@@ -24,7 +24,7 @@ services:
     environment:
       - LOCAL_DB_HOST=ns_db
       - LOCAL_NAME=Novi Sad
-      - CENTRAL_LIBRARY=central_library
+      - CENTRAL_LIBRARY=central_db
     networks:
       - network
 
@@ -39,7 +39,7 @@ services:
     environment:
       - LOCAL_DB_HOST=bg_db
       - LOCAL_NAME=Belgrade
-      - CENTRAL_LIBRARY=central_library
+      - CENTRAL_LIBRARY=central_db
     networks:
       - network
 
@@ -54,7 +54,7 @@ services:
     environment:
       - LOCAL_DB_HOST=nis_db
       - LOCAL_NAME=Nis
-      - CENTRAL_LIBRARY=central_library
+      - CENTRAL_LIBRARY=central_db
     networks:
       - network
 

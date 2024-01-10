@@ -26,7 +26,7 @@ sleep 1
 curl -X POST \
      -H "Content-Type: application/json" \
      -d '{"Name": "Nikola", "Surname": "Vukic", "Address": "Vojvode Supljikca 31", "SSN": "123"}' \
-     http://localhost:8080/register
+     http://localhost:8081/register
 echo
 sleep 1
 
@@ -35,7 +35,7 @@ sleep 1
 curl -X POST \
      -H "Content-Type: application/json" \
      -d '{"Name": "Pera", "Surname": "Peric", "Address": "Bulevar Oslobodjenja 105", "SSN": "123"}' \
-     http://localhost:8080/register
+     http://localhost:8081/register
 echo
 sleep 1
 
