@@ -47,9 +47,9 @@ func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.Borro
 	if isInvalidDTO(borrowDTO) {
 		return errors.New("All the fields are required."), http.StatusBadRequest, dto.DetailedBorrowDTO{}
 	}
-
 	client := &http.Client{}
 
+	log.Println("Trying to create a new borrow...")
 	member, err, statusCode := getMemberBySSN(borrowDTO.SSN, client)
 	if err != nil {
 		return errors.New("Member not registererd"), http.StatusBadRequest, dto.DetailedBorrowDTO{}
