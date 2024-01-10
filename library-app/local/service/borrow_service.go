@@ -156,7 +156,7 @@ func isInvalidDTO(borrowDTO dto.BorrowDTO) bool {
 func getMemberBySSN(ssn string, client *http.Client) (Member, error, int) {
 	host := os.Getenv("CENTRAL_LIBRARY")
 	log.Printf("Central host: %s\n", host)
-	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:8080/get?ssn=%s", ssn, host), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:8080/get?ssn=%s", host, ssn), nil)
 	if err != nil {
 		return Member{}, fmt.Errorf("Error creating HTTP request: %v\n", err), http.StatusInternalServerError
 	}
