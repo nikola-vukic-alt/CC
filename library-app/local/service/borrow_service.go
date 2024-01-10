@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"library-app/local/dto"
 	"library-app/local/model"
 	"library-app/local/repository"
@@ -154,7 +155,9 @@ func isInvalidDTO(borrowDTO dto.BorrowDTO) bool {
 }
 
 func getMemberBySSN(ssn string, client *http.Client) (Member, error, int) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:8080/get?ssn=%s", os.Getenv("CENTRAL_LIBRARY"), ssn), nil)
+	endpoint := fmt.Sprintf("http://%s:8080/get?ssn=%s", os.Getenv("CENTRAL_LIBRARY"), ssn)
+	log.Printf("Central library connection endpoint: %s\n", endpoint)
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return Member{}, fmt.Errorf("Error creating HTTP request: %v\n", err), http.StatusInternalServerError
 	}
@@ -166,6 +169,11 @@ func getMemberBySSN(ssn string, client *http.Client) (Member, error, int) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		errorBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return Member{}, fmt.Errorf("Error reading error response body: %v\n", err), resp.StatusCode
+		}
+		fmt.Printf("Error response body: %s\n", string(errorBody))
 		return Member{}, fmt.Errorf("Unexpected status code: %v\n", resp.StatusCode), resp.StatusCode
 	}
 
