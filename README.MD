@@ -33,7 +33,7 @@ If it was not created successfully run the following command until it's created 
 ```shell
 kubectl apply -f k8s/ingress/library-ingress.yaml
 ```
-After that start the dashboard and wait until the ingress gets its endpoint:
+After that, start the dashboard with the following command:
 ```shell
 minikube dashboard
 ```
