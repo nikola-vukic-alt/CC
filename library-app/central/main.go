@@ -34,6 +34,8 @@ func main() {
 
 	router := http.NewServeMux()
 	router.HandleFunc("/register", memberController.Register)
+	router.HandleFunc("/get", memberController.GetMemberBySSN)
+	router.HandleFunc("/update-borrow-count", memberController.UpdateBorrowCount)
 
 	server := &http.Server{
 		Addr:    ":8080",

@@ -44,7 +44,6 @@ func NewBorrowService(borrowRepo *repository.BorrowRepository) *BorrowService {
 
 // return type: (error, statusCode)
 func (s *BorrowService) CreateNewBorrow(ctx context.Context, borrowDTO dto.BorrowDTO) (error, int, dto.DetailedBorrowDTO) {
-	log.Println("Got to service...")
 	if isInvalidDTO(borrowDTO) {
 		return errors.New("All the fields are required."), http.StatusBadRequest, dto.DetailedBorrowDTO{}
 	}
@@ -156,7 +155,6 @@ func isInvalidDTO(borrowDTO dto.BorrowDTO) bool {
 
 func getMemberBySSN(ssn string, client *http.Client) (Member, error, int) {
 	endpoint := fmt.Sprintf("http://%s:8080/get?ssn=%s", os.Getenv("CENTRAL_LIBRARY"), ssn)
-	log.Printf("Central library connection endpoint: %s\n", endpoint)
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return Member{}, fmt.Errorf("Error creating HTTP request: %v\n", err), http.StatusInternalServerError

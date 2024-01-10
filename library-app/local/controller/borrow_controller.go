@@ -60,9 +60,7 @@ func (c *BorrowController) RegisterMember(w http.ResponseWriter, r *http.Request
 }
 
 func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
-	log.Println("Trying to create a new borrow 0...")
 	log.Printf("Borrow request received by the %s library.\n", os.Getenv("LOCAL_NAME"))
-	log.Println("Trying to create a new borrow 1...")
 	var borrowDTO dto.BorrowDTO
 	err := json.NewDecoder(r.Body).Decode(&borrowDTO)
 	if err != nil {
@@ -70,7 +68,6 @@ func (c *BorrowController) BorrowBook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body\n", http.StatusBadRequest)
 		return
 	}
-	log.Println("Trying to create a new borrow 2...")
 	err, statusCode, newBorrow := c.borrowService.CreateNewBorrow(context.Background(), borrowDTO)
 	if err != nil {
 		http.Error(w, err.Error(), statusCode)
